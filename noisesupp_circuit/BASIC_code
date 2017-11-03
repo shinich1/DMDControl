@@ -1,0 +1,38 @@
+symbol varA = w0 
+symbol varB = w1
+
+main:
+	do
+	if pinC.3 = 1 then
+	high B.7
+	let varA = 0
+	let varB = 1
+	do while varB <> 0
+	let varA = varA + 1
+	let varB = varA * picC.3
+	if varB > 300 then
+		let varB = 0
+	endif
+	pause 1
+	loop
+	low B.7
+	if pinC.3 = 1 then
+	do
+		sound B.6, ( 64, 100)
+		pause 500
+		sound B.6, ( 64, 100) 
+		pause 500
+	loop until pinC.3 = 0	
+	do
+		high B.5
+		pause 100
+		low B.5
+		pause 100
+	loop until pinC.2 = 1
+	else
+	pause 500
+	endif
+	endif
+	low B.7
+	loop
+	stop
