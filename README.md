@@ -2,7 +2,7 @@
 ## Digital Micromirror Device fast-fourier hologram generator
    * optimised speed using cython (feedback.pyx)
    * latest version yet to be pushed
-   * presented at https://confit.atlas.jp/guide/event/ico24/subject/W1G-02/tables?cryptoId=
+   * presented at http://ico24.org/ abstract is at https://confit.atlas.jp/guide/event/ico24/subject/W1G-02/tables?cryptoId=
    * include Andor EMCCD wrapper
    * non-cython version is optimized using numexpr parallel-processing library
 
