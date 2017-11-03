@@ -7,8 +7,8 @@
    * non-cython version is optimized using numexpr parallel-processing library
 
 ## Requirements
-   * ANDOR DDL (for feedback.pyx or andor.py
-   * NI-DAQmx DDL
+   * ANDOR DLL (for feedback.pyx or andor.py)
+   * NI-DAQmx DLL
    * pygame, pyDAQmx, numexpr
 
 ## experiment setup
