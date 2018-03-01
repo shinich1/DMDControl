@@ -2,9 +2,6 @@
 hologram.py
 takes the phasemap and target image (or function)
 returns the hologram
-
-it is defined as a class to prevent recalculation of fft
-while making the main(sequence) program simple.
 """
 import numpy as np
 import numexpr as ne
@@ -12,8 +9,6 @@ from PIL import Image as pil
 import pygame
 import matplotlib.pyplot as plt
 import scipy.special as special
-
-
 
 
 class hologram():
@@ -26,7 +21,6 @@ class hologram():
     def hologramize(self,phm,Xshift,Yshift,correction,posX,posY,P=1,alpha=14.):
         iteration = posX.shape[0]
         dmdpattern = np.zeros((1080,1920),dtype=np.int)
-        #rand = np.random.rand(self.Xsize,self.Ysize)
         fimage1 = self.fimage[1]
         gratingphase = np.zeros(self.X.shape)
         omega = ne.evaluate("fi/ph",local_dict={'fi':self.fimage[0],'ph':self.amplitudemap})
@@ -40,7 +34,6 @@ class hologram():
                 print "error"
             gratingphase += ne.evaluate("abs((Y-X+phasesum)%12.-6)/6.",local_dict={'X':self.X,'Y':self.Y,'phasesum':phasesum})
         value =ne.evaluate("rand*2/(tanh(alpha*(gratingphase+omega/2))-tanh(alpha*(gratingphase-omega/2)))",local_dict={'gratingphase':gratingphase/iteration,'omega':omega,'alpha':alpha,'rand':self.rand})
-        #dmdpattern[0:1080,420:1500]=ne.evaluate("1*(value <P)",local_dict={'value':value,"P":P})
         
         #hologram inside circular area
         dmdpattern[0:1080,420:1500]=ne.evaluate("1*(value <P)*(X**2+Y**2<620**2)",local_dict={'P':P,'value':value,'X':self.X,'Y':self.Y})
@@ -64,20 +57,18 @@ class hologram():
         elif (image =="lgaus"):
             print "lgaus"
             fimage[0] = np.absolute(self.lgaus(width,1,1))
-            fimage[1] = np.angle(self.lgaus(width,1,1))#math.pi*(lgaussian(targetshape,width)<0)
+            fimage[1] = np.angle(self.lgaus(width,1,1))
         elif (image == "circles"):
             fimage[0] = 1*(self.X**2+self.Y**2 <100)+((self.X-100)**2+self.Y**2 <100)
-        #elif (image == "circles"):
-        #    fimage[0] = 1*(self.X**2+self.Y**2 <100)+((self.X-100)**2+self.Y**2 <100)
         elif (image=="confine"):
-            #im = gaus(self.X,self.Y,0.5)#1*(self.X**2+self.Y**2<100)*(-(self.X/10)**2-(self.Y/10)**2)# + lgaus(self.X,self.Y,width*0.01,0,1)
-            #fftim = np.fft.fftshift(np.fft.fft2(im))
+            #confiment potential which compensates for large gaussian profile of optical lattice
             fimage[0] = np.absolute(-1*self.gaus(0.7)+self.lgaus(width,0,1))
             fimage[1] = np.angle(self.lgaus(self.X,self.Y,width,0,1))
             fimage[1,::2,1::2] = fimage[1,::2,::2]
             fimage[1,1::2,::2] = fimage[1,::2,::2]
             fimage[1,1::2,1::2] = fimage[1,::2,::2]
         else:
+            #for arbitrary image to be fft'ed. image shoule be large enough
             im =np.array(pil.open(image))[:,:,1]/255. 
             fftim = np.fft.fftshift(np.fft.fft2(im))
             fimage[0] = np.absolute(fftim)
@@ -100,13 +91,10 @@ class hologram():
         order = np.zeros((4,4))
         order[order1,order2] =1
         width *= self.X.shape[0]/8
-        #return 1*np.polynomial.hermite.hermval(np.sqrt(2)*self.X/width,order)*np.polynomial.hermite.hermval(np.sqrt(2)*self.Y/width,order2)*np.exp(-(self.X**2+self.Y**2)/width)
         return 1*np.polynomial.hermite.hermval2d(np.sqrt(2)*self.X/width,np.sqrt(2)*self.Y/width,order)*np.exp(-(self.X**2+self.Y**2)/width**2)
 
     def lgaus(self,width,order=2,lorder=0):
-        #order=4
-        #lorder = 3
-        width *= 0.3#1.4#0.3
+        width *= 0.3
         size = self.X.shape[0]
         x = np.linspace(0,10,size)-5
         self.X,self.Y=np.meshgrid(x,x)

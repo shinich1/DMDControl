@@ -1,16 +1,16 @@
 """
 sequencer.
 here you can define the sequence, such as triggering, delay etc.
-dmdmain_usb is the sequencer when using usb upload.
 inheriting from inst.py, zernike.py, hologram.py and dmd.py
 """
+
 import numpy as np
 import time
 import os
 import sys
 import threading
 import pygame
-from inst import Daq#,oscillo
+#from inst import Daq
 from zernike import zernikeoptim
 from hologram import hologram
 from dmd import disp
@@ -18,37 +18,24 @@ from datetime import datetime as dt
 import matplotlib.pyplot as plt
 import scipy.misc as scm
 
-class dmdmain(disp,hologram,Daq,zernikeoptim):
+class dmdmain(disp,hologram,zernikeoptim): #program testing purpose, without DAQ connection
+#class dmdmain(disp,hologram,Daq,zernikeoptim): #with daq connection
+
     def __init__(self):
         print "initializing. it may take seconds"
         self.stop_trig=False
         zernikeoptim.__init__(self)
-        Daq.__init__(self,["Dev1/ai2","Dev1/ai1"])
+        #Daq.__init__(self,["Dev1/ai2","Dev1/ai1"])
         #oscillo.__init__(self)
         hologram.__init__(self)
         self.phasemap = self.calcmaps()
         self.path="../data/"
         self.pathcheck()
-        self.defaultcoefs = np.genfromtxt("../data/default/coefs.csv",delimiter=",")
+        self.defaultcoefs = np.genfromtxt("./coefs.csv",delimiter=",")
         print "system initialized! starting pygame.."
         disp.__init__(self)
 
 
-
-
-    """
-
-    note for self.display(image,width,P,alpha,zernikeoptim=True,yb=False,ybscale=1)
-        image : "gaus","tem","sinc","linsinc",path (for a 1080*1080 image.)
-        width : w0=width*2.8mm on fourier plane (before objective)
-                    expected width on image(atom) plane:  w~=2*f*lambda/w0 =794nm/width
-
-        P: binarization criteria. default is 1
-        alpha: binarization diffusion coefficient. 5~20, default is 8
-        (optional) zernikeoptim: whether or not to use zernike coefs
-        (optional) yb: "Yb" letters using 17 gaus beams
-        (optional) yb scale: scale of yb letters.
-    """
 
 
 
@@ -103,8 +90,15 @@ class dmdmain(disp,hologram,Daq,zernikeoptim):
             self.getinput()
         self.stop()
 
-
-
+    def loopdefocus(self):
+        """ """
+        self.calcmaps()
+        for i in xrange(10):
+            self.coefs = np.array([0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])*i
+            self.calcmaps()
+            self.display("gaus",width=1.0,P=1,alpha=8.,zernikeoptim=True)
+            time.sleep(0.4)
+        self.stop()
 
 
     #####################################################
@@ -112,6 +106,17 @@ class dmdmain(disp,hologram,Daq,zernikeoptim):
     #####################################################
 
     def display(self,img,width=2.0,P=1.,alpha=8.,zernikeoptim=True,yb=False,ybscale=1):
+        """displays the img, which can either be array or "gaus" etc """
+        
+        #note for self.display(image,width,P,alpha,zernikeoptim=True,yb=False,ybscale=1)
+        #    image : "gaus","tem","sinc","linsinc",path (for a 1080*1080 image.)
+        #    width : w0=width*2.8mm on fourier plane (before objective)
+        #                expected width on image(atom) plane:  w~=2*f*lambda/w0 =794nm/width
+        #    P: binarization criteria. default is 1
+        #    alpha: binarization diffusion coefficient. 5~20, default is 8
+        #    (optional) zernikeoptim: whether or not to use zernike coefs
+        #    (optional) yb: "Yb" letters using 17 gaus beams
+        #    (optional) yb scale: scale of yb letters.
         Xshift=0
         Yshift=0
         correction=True
@@ -150,5 +155,5 @@ if __name__ == '__main__':
     #a.manualoptim()
     #a.zernikeoptimize()
     #a.coefoptimize()
-    a.dispyb()
-
+    #a.dispyb()
+    a.loopdefocus()

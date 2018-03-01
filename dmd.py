@@ -1,7 +1,5 @@
 """
 DMD HDMI control program using pygame.
-This is inherited by classes using dmd
-
 author: Shinichi Sunami
 date:12/12/2016
 """
@@ -19,27 +17,26 @@ class disp():
     def __init__(self):
         # set up pygame
         pygame.init()
-        self.windowSurface = pygame.display.set_mode((1920, 1080), FULLSCREEN)#0, 8)
+#        self.windowSurface = pygame.display.set_mode((1920, 1080), FULLSCREEN)# full HD
+        self.windowSurface = pygame.display.set_mode((1000, 800))# for laptop
         self.image = pygame.Surface((1920,1080)) 
-        self.image2 = pygame.image.load("../data/default/hologram2.jpg").convert() 
-
-
+        self.image2 = pygame.image.load("./hologram2.jpg").convert() 
         pygame.event.set_grab(True)
         pygame.mouse.set_visible(0)
         self.stop_event = threading.Event() #flag stop or not 
         self.swap_event = threading.Event()  #flag increment or not
         self.count=0
         self.count2=0
-        #create thread and start
+
+        #create pygame thread and start
         self.thread = threading.Thread(target = self.showing)
         self.thread.start()
-        #self.windowSurface.blit(self.image2,(0,0))
-        #pygame.display.flip()
 
         #pygame.surfarray.blit_array()
-        '''you can blit array directly fast. values must be [0,255] and 8 depth'''
+        '''you can blit array directly which is faster. values must be [0,255] and 8 depth'''
 
     def getinput(self):
+        """ wait for z&esc command and stop the program"""
         pygame.event.pump()
         key = pygame.key.get_pressed()
         if key[K_z] & key[K_ESCAPE] :
@@ -55,6 +52,7 @@ class disp():
         print "finished. roop count: " + str(self.count) + " , " + str(self.count2)
 
     def imgswap(self):
+        """ swap image to new one """
         for i in xrange(10):
             image = "linsinc"        
             self.image2 = self.hologramize(0.01,-0.01)
@@ -65,6 +63,7 @@ class disp():
             self.swap_event.set() 
 
     def darkim(self):
+        """ show dark image """
         darkim = np.zeros((1920,1080))
         #pygame.event.get()
         self.image2 = pygame.surfarray.make_surface(darkim*255) 
@@ -72,7 +71,7 @@ class disp():
         pygame.display.flip()
 
     def showing(self):
-    # run the pygame loop
+        """ run the pygame loop """
         #pygame.mouse.set_visible(False)
         while not self.stop_event.is_set():
             self.count +=1

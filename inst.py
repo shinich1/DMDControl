@@ -148,7 +148,7 @@ class Daq():
         task.WriteDigitalLines(1,1,1,DAQmx_Val_GroupByChannel,data,None,None)
         task.StopTask()
 
-    def sendtrig(self):　
+    def sendtrig(self):
         self.digitalon()
         self.digitaloff()
 

@@ -33,8 +33,8 @@ class zernikeoptim():
         10:second spherical
         11:glass plate compensation
         """
-        self.defaultcoefs = np.genfromtxt("../data/default/coefs.csv",delimiter=",")
-        self.coefs = np.genfromtxt("../data/default/coefs.csv",delimiter=",")[:,0]
+        self.defaultcoefs = np.genfromtxt("./coefs.csv",delimiter=",")
+        self.coefs = np.genfromtxt("./coefs.csv",delimiter=",")[:,0]
         self.zernikemaps=zernikemaps() #10*1080*1080 numpy array. valid only in circular region.
 
     def calcmaps(self): #coefs:1*8 array
@@ -47,7 +47,7 @@ class zernikeoptim():
     def csvupdate(self):
         while not self.stop_trig:
             time.sleep(1)
-            self.defaultcoefs = np.genfromtxt("../data/default/coefs.csv",delimiter=",")
+            self.defaultcoefs = np.genfromtxt("./coefs.csv",delimiter=",")
 
 
 def zernikemaps():
