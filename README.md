@@ -18,8 +18,11 @@
 
 ## program usage
 programming a sequence such as triggering, loop, hologram generation can be done in `dmdmain` class in main.py. 
+
 #test run
 `python main.py`
+
 it displays a gaussian and loops over different defocus coefficients.
+
 #functions used in `main.py`
 
