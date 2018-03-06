@@ -36,8 +36,9 @@ class dmdmain(disp,hologram,zernikeoptim): #program testing purpose, without DAQ
         disp.__init__(self)
 
 
-
-
+    ################################
+    #sequence programmer, you can define your sequence below as a function
+    ################################
 
     
     def manualoptim(self):
@@ -102,7 +103,7 @@ class dmdmain(disp,hologram,zernikeoptim): #program testing purpose, without DAQ
 
 
     #####################################################
-
+    #functions used in class dmdmain
     #####################################################
 
     def display(self,img,width=2.0,P=1.,alpha=8.,zernikeoptim=True,yb=False,ybscale=1):
